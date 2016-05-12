@@ -13,10 +13,13 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 class ApiExceptionSubscriber implements EventSubscriberInterface
 
 {
- 
-    
      public function onKernelException(GetResponseForExceptionEvent $event)
     {
+        // only reply to /api URLs
+        if (strpos($event->getRequest()->getPathInfo(), '/api') !== 0) {
+            return;
+        }
+         
         $e = $event->getException();
         if ($e instanceof ApiProblemException) {
             $apiProblem = $e->getApiProblem();
@@ -25,6 +28,16 @@ class ApiExceptionSubscriber implements EventSubscriberInterface
             $apiProblem = new ApiProblem(
                 $statusCode
             );
+            
+            /*
+             * If it's an HttpException message (e.g. for 404, 403),
+             * we'll say as a rule that the exception message is safe
+             * for the client. Otherwise, it could be some sensitive
+             * low-level exception, which should *not* be exposed
+             */
+            if ($e instanceof HttpExceptionInterface) {
+                $apiProblem->set('detail', $e->getMessage());
+            }
         }
         
         $response = new JsonResponse(
