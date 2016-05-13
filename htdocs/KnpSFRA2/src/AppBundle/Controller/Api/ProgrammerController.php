@@ -1,14 +1,13 @@
 <?php
 
-namespace AppBundle\Controller\Api;
 
+namespace AppBundle\Controller\Api;
 use AppBundle\Api\ApiProblem;
 use AppBundle\Api\ApiProblemException;
 use AppBundle\Controller\BaseController;
 use AppBundle\Entity\Programmer;
 use AppBundle\Form\ProgrammerType;
 use AppBundle\Form\UpdateProgrammerType;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Form\FormInterface;
@@ -16,7 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-
 class ProgrammerController extends BaseController
 {
     /**
@@ -31,7 +29,6 @@ class ProgrammerController extends BaseController
         if (!$form->isValid()) {
             $this->throwApiProblemValidationException($form);
         }
-        
         $programmer->setUser($this->findUserByUsername('weaverryan'));
         $em = $this->getDoctrine()->getManager();
         $em->persist($programmer);
@@ -91,11 +88,9 @@ class ProgrammerController extends BaseController
         }
         $form = $this->createForm(new UpdateProgrammerType(), $programmer);
         $this->processForm($request, $form);
-        
         if (!$form->isValid()) {
             $this->throwApiProblemValidationException($form);
         }
-       
         $em = $this->getDoctrine()->getManager();
         $em->persist($programmer);
         $em->flush();
@@ -131,8 +126,6 @@ class ProgrammerController extends BaseController
         $clearMissing = $request->getMethod() != 'PATCH';
         $form->submit($data, $clearMissing);
     }
-    
-    
     private function getErrorsFromForm(FormInterface $form)
     {
         $errors = array();
@@ -148,7 +141,6 @@ class ProgrammerController extends BaseController
         }
         return $errors;
     }
-    
     private function throwApiProblemValidationException(FormInterface $form)
     {
         $errors = $this->getErrorsFromForm($form);
